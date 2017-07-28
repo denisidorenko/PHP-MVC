@@ -29,12 +29,19 @@ class Router {
     foreach ($this->routes as $uriPattern => $path){
       if(preg_match("~$uriPattern~", $uri)){
 
-      $segment = explode('/' , $path); // Разделили имя Контроллера и его модификатор
+    ## Получаем внутрений путь из внешнего согласно правилу
+
+    $internalRoute = preg_replace("~$uriPattern~",$path, $uri);
+
+
+      $segments = explode('/' , $internalRoute); // Разделили имя Контроллера и его модификатор
       
-      $controllerName = array_shift($segment).'Controller'; // Редактируем первый элемент массива
+      $controllerName = array_shift($segments).'Controller'; // Редактируем первый элемент массива
       $controllerName = ucfirst($controllerName); // Первая буква заглавная
 
-      $actionName = 'action'.ucfirst(array_shift($segment)); // Получаем имя модификатора
+      $actionName = 'action'.ucfirst(array_shift($segments)); // Получаем имя модификатора
+
+      $parameters = $segments;
 
       ## Прописываем путь к файлам
 
@@ -45,7 +52,8 @@ class Router {
         }
       
       $controllerObject = new $controllerName;
-      $result = $controllerObject->$actionName();
+      $result = call_user_func_array(array($controllerObject, $actionName), $parameters);
+
       if($result != null){
         break;
       }

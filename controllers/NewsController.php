@@ -8,8 +8,9 @@
       return true;
     }
 
-    public function actionView(){
-      echo 'Просмотр одной новости';
+    public function actionView($category, $id){
+      echo $category;
+      echo $id;
       return true;
     }
 
